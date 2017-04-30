@@ -11,6 +11,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
@@ -23,7 +25,6 @@ public class MyDrivewayPhoto extends AppCompatActivity {
     private ImageView mPlowedDrivewayPhoto;
 
     private StorageReference mDrivewayPhotoFolder = FirebaseStorage.getInstance().getReference();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -15,6 +15,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -44,6 +46,9 @@ public class DrivewayPhoto extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driveway_photo);
+
+        final DatabaseReference snowPlowDbRef = FirebaseDatabase.getInstance().getReference("users/" + ((GlobalVariables) getApplication()).getUserUID());
+        final DatabaseReference sensorOwnerDbRef = FirebaseDatabase.getInstance().getReference("users/" + ((GlobalVariables) getApplication()).getJobDeliveredToUID());
 
         mUpload = (Button) findViewById(R.id.uploadpicture);
         mDrivewayPicture = (ImageView) findViewById(R.id.drivewaypicture);
@@ -94,12 +99,11 @@ public class DrivewayPhoto extends AppCompatActivity {
         if ((requestCode == REQUEST_TAKE_PHOTO) && (resultCode == RESULT_OK)) {
 
             PhotoUri = data.getData();
-
 //            .putExtra(MediaStore.EXTRA_OUTPUT, uri);
 
-            if (PhotoUri == null) {
-                Toast.makeText(DrivewayPhoto.this, "Photo was not captured, URI is null.", Toast.LENGTH_LONG).show();
-            } else {
+//            if (PhotoUri == null) {
+//                Toast.makeText(DrivewayPhoto.this, "Photo was not captured, URI is null.", Toast.LENGTH_LONG).show();
+//            } else {
 
                 mProgressDialogue.setMessage("Upload on going");
                 mProgressDialogue.show();
@@ -112,7 +116,20 @@ public class DrivewayPhoto extends AppCompatActivity {
 
                         mProgressDialogue.dismiss();
 
+                        DatabaseReference snowPlowDbRef = FirebaseDatabase.getInstance().getReference("users/" + ((GlobalVariables) getApplication()).getUserUID());
+                        DatabaseReference sensorOwnerDbRef = FirebaseDatabase.getInstance().getReference("users/" + ((GlobalVariables) getApplication()).getJobDeliveredToUID());
+
+                        snowPlowDbRef.child("requesthandle/jobDeliveredToUID").setValue("null");
+                        sensorOwnerDbRef.child("requesthandle/prompt").setValue(3);                         //causes user to receive message that their driveway has been plowed and a picture is now available
+                        sensorOwnerDbRef.child("requesthandle/jobAssignedToUID").setValue("null");
+                        ((GlobalVariables) getApplication()).setJobDeliveredToUID(null);
+
                         Toast.makeText(DrivewayPhoto.this, "Upload finished", Toast.LENGTH_LONG).show();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(DrivewayPhoto.this, "Photo was not captured, URI is null.", Toast.LENGTH_LONG).show();
                     }
                 });
             }
@@ -142,4 +159,4 @@ public class DrivewayPhoto extends AppCompatActivity {
 //            }
 //        }
 //    }
-}
+//}

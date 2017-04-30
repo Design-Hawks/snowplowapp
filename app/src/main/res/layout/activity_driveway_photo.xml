@@ -11,15 +11,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.snowiot.snowiotsimple.DrivewayPhoto">
 
-    <Button
-        android:text="Upload"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/uploadpicture"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -27,5 +18,13 @@
         android:id="@+id/drivewaypicture"
         android:layout_centerHorizontal="true"
         android:layout_above="@+id/uploadpicture" />
+
+    <Button
+        android:text="Take Picture And Upload"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/uploadpicture"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

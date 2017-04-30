@@ -18,6 +18,7 @@
 package com.example.snowiot.snowiotsimple;
 
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -71,9 +72,9 @@ public class MapsServiceMode extends AppCompatActivity implements
                 @Override
                 public void onClick(View v) {
                     snowPlowDbRef.child("requesthandle/jobDeliveredToUID").setValue("null");
-                    sensorOwnerDbRef.child("requesthandle/prompt").setValue(2);
                     sensorOwnerDbRef.child("requesthandle/jobAssignedToUID").setValue("null");
                     ((GlobalVariables) getApplication()).setJobDeliveredToUID(null);
+                    sensorOwnerDbRef.child("requesthandle/prompt").setValue(2);
                     finish();
                 }
             });
@@ -81,10 +82,15 @@ public class MapsServiceMode extends AppCompatActivity implements
         mJobFinished.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+//                Intent drivewayPlowed = new Intent(MapsServiceMode.this, DrivewayPhoto.class);
+//                startActivity(drivewayPlowed);
+
                 snowPlowDbRef.child("requesthandle/jobDeliveredToUID").setValue("null");
-                sensorOwnerDbRef.child("requesthandle/prompt").setValue(3);                         //causes user to receive message that their driveway has been plowed and a picture is now available
                 sensorOwnerDbRef.child("requesthandle/jobAssignedToUID").setValue("null");
+                sensorOwnerDbRef.child("requesthandle/pendingSnowPlowRating").setValue(((GlobalVariables) getApplication()).getUserUID());
                 ((GlobalVariables) getApplication()).setJobDeliveredToUID(null);
+                sensorOwnerDbRef.child("requesthandle/prompt").setValue(3);                         //causes user to receive message that their driveway has been plowed and a picture is now available
                 finish();
             }
             });
@@ -109,7 +115,7 @@ public class MapsServiceMode extends AppCompatActivity implements
 
         DatabaseReference drivewaysRef = FirebaseDatabase.getInstance().getReference("driveways");
 
-        drivewaysRef.addValueEventListener(new ValueEventListener() {
+        drivewaysRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Iterable<DataSnapshot> dataSnapshots = dataSnapshot.getChildren();

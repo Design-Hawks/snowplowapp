@@ -12,154 +12,28 @@
 
 
     <Button
-        android:text="Recalibrate"
+        android:text="Start Work Shift"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="17dp"
-        android:id="@+id/recalibrate"
+        android:id="@+id/startWork"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
-    <Switch
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:layout_marginLeft="225dp"
-        android:id="@+id/snowdepthswitch"
-        android:layout_below="@+id/recalibrate"/>
-
-
-    <Switch
-        android:text=""
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:id="@+id/showUserOnMap"
-        android:layout_below="@+id/snowdepthswitch"
-        android:layout_alignLeft="@+id/snowdepthswitch"
-        android:layout_alignStart="@+id/snowdepthswitch" />
-
-    <Switch
-        android:text=""
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/enableSnowWarning"
-        android:layout_centerVertical="true"
-        android:layout_alignLeft="@+id/showUserOnMap"
-        android:layout_alignStart="@+id/showUserOnMap" />
-
-    <TextView
-        android:layout_width="200dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="34dp"
-        android:id="@+id/baseheight"
-        android:textSize="18sp"
-        android:textColor="@color/authui_inputTextColorDark"
-        android:layout_below="@+id/enableSnowWarning"
-        android:layout_alignLeft="@+id/enableSnowWarning"
-        android:layout_alignStart="@+id/enableSnowWarning"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="158dp"
-        android:layout_alignRight="@+id/enableSnowWarning"
-        android:layout_alignEnd="@+id/enableSnowWarning" />
-
-    <TextView
-        android:text="Base Height (cm)"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView4"
-        android:textSize="18sp"
-        android:textColor="@color/authui_inputTextColorDark"
-        android:textAlignment="center"
-        android:layout_alignLeft="@+id/textView3"
-        android:layout_alignStart="@+id/textView3"
-        android:layout_alignTop="@+id/baseheight"
-        android:layout_alignRight="@+id/textView3"
-        android:layout_alignEnd="@+id/textView3"
-        android:layout_alignBottom="@+id/baseheight" />
-
-    <TextView
-        android:text="Display Snow Depth"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView3"
-        android:textSize="18sp"
-        android:textColor="@color/authui_inputTextColorDark"
-        android:textAlignment="center"
-        android:layout_above="@+id/showUserOnMap"
-        android:layout_alignTop="@+id/snowdepthswitch" />
-
-    <TextView
-        android:text="Enable Services"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView6"
-        android:textSize="18sp"
-        android:textColor="@color/authui_inputTextColorDark"
-        android:textAlignment="center"
-        android:layout_alignTop="@+id/showUserOnMap"
-        android:layout_alignRight="@+id/textView3"
-        android:layout_alignEnd="@+id/textView3"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignBottom="@+id/showUserOnMap" />
-
-    <TextView
-        android:text="Enable Snow Alerts"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView7"
-        android:textSize="18sp"
-        android:textColor="@color/authui_inputTextColorDark"
-        android:textAlignment="center"
-        android:layout_alignTop="@+id/enableSnowWarning"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_above="@+id/baseheight"
-        android:layout_alignRight="@+id/textView6"
-        android:layout_alignEnd="@+id/textView6" />
 
     <Button
-        android:text="Request Snow Removal"
+        android:text="End Work Shift"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:id="@+id/endWork"
+        android:layout_below="@+id/startWork"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginBottom="28dp"
-        android:id="@+id/requestService"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
-
-    <Button
-        android:text="Snow Threshold (cm)"
-        android:textSize="12sp"
-        android:layout_width="150dp"
-        android:layout_height="50dp"
-        android:id="@+id/setSnowThreshold"
-        android:layout_above="@+id/requestService"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="11dp"
-        android:layout_alignRight="@+id/textView4"
-        android:layout_alignEnd="@+id/textView4" />
-
-    <TextView
-        android:text=""
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView8"
-        android:textSize="18sp"
-        android:textColor="@color/authui_inputTextColorDark"
-        android:layout_alignBottom="@+id/setSnowThreshold"
-        android:layout_alignTop="@+id/setSnowThreshold"
-        android:layout_alignLeft="@+id/baseheight"
-        android:layout_alignStart="@+id/baseheight"
-        android:layout_alignRight="@+id/baseheight"
-        android:layout_alignEnd="@+id/baseheight" />
 
 
 </RelativeLayout>

@@ -50,12 +50,15 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+
+import java.util.HashMap;
 
 public class maps extends AppCompatActivity implements
         OnMapReadyCallback,
@@ -124,8 +127,13 @@ public class maps extends AppCompatActivity implements
             public void onClick(View v) {
 
 
-                Intent contactUser = new Intent(maps.this, ContactSensorOwner.class);
-                startActivity(contactUser);
+                if (((GlobalVariables) getApplication()).getUserUIDFromMap() != null) {
+                    Intent contactUser = new Intent(maps.this, ContactSensorOwner.class);
+                    startActivity(contactUser);
+                }
+                else{
+                    Toast.makeText(getApplicationContext(), "You must select an user first.", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -136,11 +144,6 @@ public class maps extends AppCompatActivity implements
         // Add a marker in Sydney, Australia,
         // and move the map's camera to the same location.
         this.drivewayMap = drivewayMap;
-
-        /*LatLng sydney = new LatLng(-33.852, 151.211);
-        drivewayMap.addMarker(new MarkerOptions().position(sydney)
-                .title("Marker in Sydney"));
-        drivewayMap.moveCamera(CameraUpdateFactory.newLatLng(sydney)); */
 
         loadDrivewayLocations();
 
@@ -187,43 +190,80 @@ public class maps extends AppCompatActivity implements
         DatabaseReference drivewaysRef = FirebaseDatabase.getInstance().getReference("driveways");
         final String userUID = ((GlobalVariables) getApplication()).getUserUID();
 
-        drivewaysRef.addValueEventListener(new ValueEventListener() {
+        drivewaysRef.addChildEventListener(new ChildEventListener() {
+            HashMap<String, Driveways> userMarkers = new HashMap<String, Driveways>();
+
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Iterable<DataSnapshot> dataSnapshots = dataSnapshot.getChildren();
-                drivewayMap.clear();
-                for (DataSnapshot dataSnapshot1 : dataSnapshots) {
-                    Driveways driveway = dataSnapshot1.getValue(Driveways.class);
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
-                    if ((dataSnapshot1.getKey().equals(userUID))&&(driveway.getStatus() != 0)&&(zoomInOnMapOnceFlag == 0)) {
-                        drivewayMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(driveway.getLatitude(), driveway.getLongitude()), 11));          //zoom in on user's marker
-                        zoomInOnMapOnceFlag = 1;   //makes it so that the map doesn't zoom in everytime there is an update
-                    }
+                Driveways driveway = dataSnapshot.getValue(Driveways.class);
 
-
-                    if ((driveway.getType().equals("sensor")) && (driveway.getStatus() == 1)) {
-                        drivewayMap.addMarker(new MarkerOptions().position(new LatLng(driveway.getLatitude(), driveway.getLongitude()))
-                                .title(dataSnapshot1.getKey())                                                                                       //get node name, which should be user UID
-                                .snippet(driveway.getName() + " at:" + driveway.address.getStreet() + ", " + driveway.address.getCity() + ", " + driveway.address.getState())    //Tutorial on this code by "GDD Recife" on youtube
-                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));                                                                //Green means operating but not in need of service
-                    } else if ((driveway.getType().equals("sensor")) && (driveway.getStatus() == 2)) {
-                        drivewayMap.addMarker(new MarkerOptions().position(new LatLng(driveway.getLatitude(), driveway.getLongitude()))
-                                .title(dataSnapshot1.getKey())
-                                .snippet(driveway.getName() + " at: " + driveway.address.getStreet() + ", " + driveway.address.getCity() + ", " + driveway.address.getState())
-                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));                                                                  //Red means operating and in need of service
-                    } else if ((driveway.getType().equals("sensor")) && (driveway.getStatus() == 3)) {
-                        drivewayMap.addMarker(new MarkerOptions().position(new LatLng(driveway.getLatitude(), driveway.getLongitude()))
-                                .title(dataSnapshot1.getKey())
-                                .snippet(driveway.getName() + " at: " + driveway.address.getStreet() + ", " + driveway.address.getCity() + ", " + driveway.address.getState())
-                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));                                                                 //Blue means operating and already being serviced by a snowplow
-                    } else if (driveway.getType().equals("plower") && (driveway.getStatus() != 0) && (!(dataSnapshot1.getKey().equals(userUID)))) {
-                        drivewayMap.addMarker(new MarkerOptions().position(new LatLng(driveway.getLatitude(), driveway.getLongitude()))                                 //Status: 0 = not on duty, 1 = on duty and standby, 2 = on duty but busy
-                                .title(dataSnapshot1.getKey())
-                                .snippet(driveway.getName())
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.plower)));
-                    }
-
+                if ((dataSnapshot.getKey().equals(userUID)) && (zoomInOnMapOnceFlag == 0)) {
+                    drivewayMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(driveway.getLatitude(), driveway.getLongitude()), 11));          //zoom in on user's marker
+                    zoomInOnMapOnceFlag = 1;   //makes it so that the map doesn't zoom in everytime there is an update
                 }
+
+                if ((driveway.getType().equals("sensor")) && (driveway.getStatus() == 1)) {
+                    drivewayMap.addMarker(new MarkerOptions().position(new LatLng(driveway.getLatitude(), driveway.getLongitude()))
+                            .title(dataSnapshot.getKey())                                                                                       //get node name, which should be user UID
+                            .snippet(driveway.getName() + " at:" + driveway.address.getStreet() + ", " + driveway.address.getCity() + ", " + driveway.address.getState())    //Tutorial on this code by "GDD Recife" on youtube
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));                                                                //Green means operating but not in need of service
+                            userMarkers.put(dataSnapshot.getKey(), dataSnapshot.getValue(Driveways.class));
+                } else if ((driveway.getType().equals("sensor")) && (driveway.getStatus() == 2)) {
+                    drivewayMap.addMarker(new MarkerOptions().position(new LatLng(driveway.getLatitude(), driveway.getLongitude()))
+                            .title(dataSnapshot.getKey())
+                            .snippet(driveway.getName() + " at: " + driveway.address.getStreet() + ", " + driveway.address.getCity() + ", " + driveway.address.getState())
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));                                                                  //Red means operating and in need of service
+                            userMarkers.put(dataSnapshot.getKey(), dataSnapshot.getValue(Driveways.class));
+                } else if ((driveway.getType().equals("sensor")) && (driveway.getStatus() == 3)) {
+                    drivewayMap.addMarker(new MarkerOptions().position(new LatLng(driveway.getLatitude(), driveway.getLongitude()))
+                            .title(dataSnapshot.getKey())
+                            .snippet(driveway.getName() + " at: " + driveway.address.getStreet() + ", " + driveway.address.getCity() + ", " + driveway.address.getState())
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));                                                                 //Blue means operating and already being serviced by a snowplow
+                            userMarkers.put(dataSnapshot.getKey(), dataSnapshot.getValue(Driveways.class));
+                }
+                }
+
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                Driveways updatedDrivewayData = dataSnapshot.getValue(Driveways.class);
+
+                    userMarkers.put(dataSnapshot.getKey(), updatedDrivewayData);
+                    drivewayMap.clear();
+
+                    for (String key : userMarkers.keySet()) {
+                        Driveways driveway = userMarkers.get(key);
+
+                            if ((driveway.getType().equals("sensor")) && (driveway.getStatus() == 1)) {
+                                drivewayMap.addMarker(new MarkerOptions().position(new LatLng(driveway.getLatitude(), driveway.getLongitude()))
+                                        .title(dataSnapshot.getKey())                                                                                       //get node name, which should be user UID
+                                        .snippet(driveway.getName() + " at:" + driveway.address.getStreet() + ", " + driveway.address.getCity() + ", " + driveway.address.getState())    //Tutorial on this code by "GDD Recife" on youtube
+                                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));                                                                //Green means operating but not in need of service
+                            } else if ((driveway.getType().equals("sensor")) && (driveway.getStatus() == 2)) {
+                                drivewayMap.addMarker(new MarkerOptions().position(new LatLng(driveway.getLatitude(), driveway.getLongitude()))
+                                        .title(dataSnapshot.getKey())
+                                        .snippet(driveway.getName() + " at: " + driveway.address.getStreet() + ", " + driveway.address.getCity() + ", " + driveway.address.getState())
+                                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));                                                                  //Red means operating and in need of service
+                            } else if ((driveway.getType().equals("sensor")) && (driveway.getStatus() == 3)) {
+                                drivewayMap.addMarker(new MarkerOptions().position(new LatLng(driveway.getLatitude(), driveway.getLongitude()))
+                                        .title(dataSnapshot.getKey())
+                                        .snippet(driveway.getName() + " at: " + driveway.address.getStreet() + ", " + driveway.address.getCity() + ", " + driveway.address.getState())
+                                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));                                                                 //Blue means operating and already being serviced by a snowplow
+                            }
+
+                        }
+                    }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
             }
 
             @Override
@@ -231,33 +271,70 @@ public class maps extends AppCompatActivity implements
 
             }
         });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//        DatabaseReference drivewaysRef = FirebaseDatabase.getInstance().getReference("driveways");
+//        final String userUID = ((GlobalVariables) getApplication()).getUserUID();
+//
+//        drivewaysRef.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                Iterable<DataSnapshot> dataSnapshots = dataSnapshot.getChildren();
+//                drivewayMap.clear();
+//                for (DataSnapshot dataSnapshot1 : dataSnapshots) {
+//                    Driveways driveway = dataSnapshot1.getValue(Driveways.class);
+//
+//                    if ((dataSnapshot1.getKey().equals(userUID))&&(driveway.getStatus() != 0)&&(zoomInOnMapOnceFlag == 0)) {
+//                        drivewayMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(driveway.getLatitude(), driveway.getLongitude()), 11));          //zoom in on user's marker
+//                        zoomInOnMapOnceFlag = 1;   //makes it so that the map doesn't zoom in everytime there is an update
+//                    }
+//
+//
+//                    if ((driveway.getType().equals("sensor")) && (driveway.getStatus() == 1)) {
+//                        drivewayMap.addMarker(new MarkerOptions().position(new LatLng(driveway.getLatitude(), driveway.getLongitude()))
+//                                .title(dataSnapshot1.getKey())                                                                                       //get node name, which should be user UID
+//                                .snippet(driveway.getName() + " at:" + driveway.address.getStreet() + ", " + driveway.address.getCity() + ", " + driveway.address.getState())    //Tutorial on this code by "GDD Recife" on youtube
+//                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));                                                                //Green means operating but not in need of service
+//                    } else if ((driveway.getType().equals("sensor")) && (driveway.getStatus() == 2)) {
+//                        drivewayMap.addMarker(new MarkerOptions().position(new LatLng(driveway.getLatitude(), driveway.getLongitude()))
+//                                .title(dataSnapshot1.getKey())
+//                                .snippet(driveway.getName() + " at: " + driveway.address.getStreet() + ", " + driveway.address.getCity() + ", " + driveway.address.getState())
+//                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));                                                                  //Red means operating and in need of service
+//                    } else if ((driveway.getType().equals("sensor")) && (driveway.getStatus() == 3)) {
+//                        drivewayMap.addMarker(new MarkerOptions().position(new LatLng(driveway.getLatitude(), driveway.getLongitude()))
+//                                .title(dataSnapshot1.getKey())
+//                                .snippet(driveway.getName() + " at: " + driveway.address.getStreet() + ", " + driveway.address.getCity() + ", " + driveway.address.getState())
+//                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));                                                                 //Blue means operating and already being serviced by a snowplow
+//                    }
+//
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
     }
 
-//    @Override
-//    public boolean onMarkerClick(final Marker marker) {
-//
-//         Retrieve the data from the marker.
-//        Integer clickCount = (Integer) marker.getTag();
-//
-//        // Check if a click count was set, then display the click count.
-//        if (clickCount != null) {
-//            clickCount = clickCount + 1;
-//            marker.setTag(clickCount);
-//            Toast.makeText(this,
-//                    marker.getTitle() +
-//                            " has been clicked " + clickCount + " times.",
-//                    Toast.LENGTH_SHORT).show();
-//        Toast.makeText(this, marker.getTitle(),
-//                Toast.LENGTH_SHORT).show();
-//
-//
-//        }
-//
-//        // Return false to indicate that we have not consumed the event and that we wish
-//        // for the default behavior to occur (which is for the camera to move such that the
-//        // marker is centered and for the marker's info window to open, if it has one).
-//        return false;
-//    }
+
 
     /**
      * Enables the My Location layer if the fine location permission has been granted.
@@ -348,8 +425,6 @@ public class maps extends AppCompatActivity implements
         DatabaseReference mSnowPlowInServiceCurrentLocation = FirebaseDatabase.getInstance().getReference("driveways/" + ((GlobalVariables) this.getApplication()).getUserUID());
         mSnowPlowInServiceCurrentLocation.child("latitude").setValue(location.getLatitude());
         mSnowPlowInServiceCurrentLocation.child("longitude").setValue(location.getLongitude());
-//        snowPlowLatitude = location.getLatitude();
-//        snowPlowLongitude = location.getLongitude();
     }
 
     //Necessary to stop tracking user when app is in the background

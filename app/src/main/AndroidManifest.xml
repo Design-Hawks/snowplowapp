@@ -15,8 +15,8 @@
     <application
         android:name=".GlobalVariables"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="SnowSense"
+        android:icon="@drawable/plower"
+        android:label="SnowSensePlower"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <meta-data
@@ -39,7 +39,7 @@
         <activity android:name=".Credits" />
         <activity
             android:name=".MainActivity"
-            android:label="Sensor Status" />
+            android:label="Main Menu" />
         <activity
             android:name=".maps"
             android:label="User Map"

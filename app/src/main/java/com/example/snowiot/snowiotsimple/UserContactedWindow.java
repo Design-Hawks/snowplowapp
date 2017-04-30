@@ -59,7 +59,6 @@ public class UserContactedWindow extends AppCompatActivity {
 
         mAcceptService = (Button) findViewById(R.id.hireContacter);
         mDeclineService = (Button) findViewById(R.id.declineContacter);
-//        mNotificationTest = (Button) findViewById(R.id.notifytest);
         mContacterName = (TextView) findViewById(R.id.contacterName);
         mContactorInfo = (TextView) findViewById(R.id.contacterInfo);
         mContactorPhoto = (ImageView) findViewById(R.id.snowPlowPhoto);
@@ -72,9 +71,13 @@ public class UserContactedWindow extends AppCompatActivity {
         mRootRef = FirebaseDatabase.getInstance().getReference();
 
         final DatabaseReference mUserInfoRef = mRootRef.child("driveways/" + ((GlobalVariables) this.getApplication()).getUserUID());
-        mUserHandleRef = FirebaseDatabase.getInstance().getReferenceFromUrl("https://snowtotals-68015.firebaseio.com/users/" + ((GlobalVariables) this.getApplication()).getUserUID() + "/requesthandle");
-        mContactorHandleRef = FirebaseDatabase.getInstance().getReferenceFromUrl("https://snowtotals-68015.firebaseio.com/users/" + ((GlobalVariables) this.getApplication()).getContacterUID() + "/requesthandle");
-        mContactorInfoRef = FirebaseDatabase.getInstance().getReferenceFromUrl("https://snowtotals-68015.firebaseio.com/driveways/" + ((GlobalVariables) this.getApplication()).getContacterUID());
+        mUserHandleRef = mRootRef.child(((GlobalVariables) this.getApplication()).getUserUID() + "/requesthandle");
+        mContactorHandleRef = mRootRef.child("users/" + ((GlobalVariables) this.getApplication()).getContacterUID() + "/requesthandle");
+        mContactorInfoRef = mRootRef.child("driveways/" + ((GlobalVariables) this.getApplication()).getContacterUID());
+
+//        mUserHandleRef = FirebaseDatabase.getInstance().getReferenceFromUrl("https://snowtotals-68015.firebaseio.com/users/" + ((GlobalVariables) this.getApplication()).getUserUID() + "/requesthandle");
+//        mContactorHandleRef = FirebaseDatabase.getInstance().getReferenceFromUrl("https://snowtotals-68015.firebaseio.com/users/" + ((GlobalVariables) this.getApplication()).getContacterUID() + "/requesthandle");
+//        mContactorInfoRef = FirebaseDatabase.getInstance().getReferenceFromUrl("https://snowtotals-68015.firebaseio.com/driveways/" + ((GlobalVariables) this.getApplication()).getContacterUID());
 
         mContactorInfoRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -84,9 +87,6 @@ public class UserContactedWindow extends AppCompatActivity {
                 mContacterName.setText("Provider: " + holdContacterInfo.getName());
                 mContacterName.setTextSize(18);
                 mContacterName.setTextColor(Color.BLACK);
-//                mContacterInfo.setText("Info: " + holdUserInfo.address.getStreet() + ", " + holdUserInfo.address.getCity() + ", " + holdUserInfo.address.getState());
-//                mContacterInfo.setTextSize(18);
-//                mContacterInfo.setTextColor(Color.BLACK);
             }
 
             @Override
@@ -98,8 +98,6 @@ public class UserContactedWindow extends AppCompatActivity {
         mAcceptService.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                mContactorHandleRef.child("acceptdecline").setValue(1); //Use contactor's database section instead since there is a possibility that the user might accept someone else's offer
-//                mContactorHandleRef.child("recipientUserID").setValue(((GlobalVariables) getApplication()).getUserUID());
                 mUserInfoRef.child("status").setValue(3);                             //Turn user marker on map blue
                 mUserHandleRef.child("prompt").setValue(0);             //If user accepts offer then reset prompt that triggers notification
                 mUserHandleRef.child("jobAssignedToUID").setValue(((GlobalVariables) getApplication()).getContacterUID());
@@ -112,8 +110,6 @@ public class UserContactedWindow extends AppCompatActivity {
         mDeclineService.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                mContactorHandleRef.child("acceptdecline").setValue(0); //Use contactor's database section instead since there is a possibility that the user might accept someone else's offer
-//                mContactorHandleRef.child("recipientUserID").setValue(((GlobalVariables) getApplication()).getUserUID());
                 mUserHandleRef.child("prompt").setValue(0);             //If user declines offer then reset prompt that triggers notification
                 mUserHandleRef.child("jobAssignedToUID").setValue("null");
                 mContactorHandleRef.child("jobDeliveredToUID").setValue("null");

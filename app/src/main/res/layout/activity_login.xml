@@ -59,5 +59,16 @@
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Snow Plower Version"
+            android:id="@+id/TextView11"
+            android:textColor="@color/tw__composer_black"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:textStyle="normal|bold"
+            android:textAllCaps="true" />
     </RelativeLayout>
 </RelativeLayout>
